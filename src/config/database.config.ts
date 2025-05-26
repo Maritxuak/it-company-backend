@@ -5,7 +5,7 @@ export const databaseConfig = (): TypeOrmModuleOptions => ({
   host: 'localhost',
   port: parseInt('5432', 10),
   username: 'postgres',
-  password: '1122334455',
+  password: '',
   database: 'it_company',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   synchronize: process.env.NODE_ENV !== 'production', // Set to false in production
