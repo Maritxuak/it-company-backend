@@ -1,49 +1,30 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from 'typeorm';
 import { User } from './user.entity';
-import { Project } from './project.entity';
-import { Comment } from './comment.entity';
-
-export enum TaskStatus {
-  PENDING = 'pending',       // В ожидании
-  IN_PROGRESS = 'in_progress', // В разработке
-  IN_REVIEW = 'in_review',    // На проверке
-  CLOSED = 'closed',         // Закрыто
-  BLOCKED = 'blocked'        // Заблокировано
-}
 
 @Entity()
-export class Task {
+export class Profile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  title: string;
+  @Column({ nullable: true })
+  firstName: string;
 
-  @Column()
-  description: string;
+  @Column({ nullable: true })
+  lastName: string;
 
-  @Column()
-  dueDate: Date;
+  @Column({ nullable: true })
+  about: string;
 
-  @Column()
-  estimatedTime: string;
+  @Column({ nullable: true })
+  birthDate: Date;
 
-  @Column({
-    type: 'enum',
-    enum: TaskStatus,
-    default: TaskStatus.PENDING
-  })
-  status: TaskStatus;
+  @Column({ nullable: true })
+  education: string;
 
-  @ManyToOne(() => User, (user) => user.assignedTasks)
-  assignedTo: User;
+  @Column({ nullable: true })
+  gender: string;
 
-  @ManyToOne(() => User, (user) => user.createdTasks)
-  creator: User;
-
-  @ManyToOne(() => Project, (project) => project.tasks)
-  project: Project;
-
-  @OneToMany(() => Comment, (comment) => comment.task)
-  comments: Comment[];
+  @OneToOne(() => User, (user) => user.profile)
+  @JoinColumn()
+  user: User;
 }
