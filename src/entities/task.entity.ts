@@ -12,7 +12,7 @@ export class Task {
   title: string;
 
   @Column()
-  description: string;
+  description: Text;
 
   @Column()
   dueDate: Date;
