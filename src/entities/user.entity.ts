@@ -1,85 +1,96 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+// user.entity.ts
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToMany } from 'typeorm';
 import { Profile } from './profile.entity';
-import { Vacancy } from './vacancy.entity';
+import { UserRole } from '../enum/user-role.enum';
 import { Candidate } from './candidate.entity';
-import { Notification } from './notification.entity';
 import { Chat } from './chat.entity';
-import { Project } from './project.entity';
-import { Task } from './task.entity';
 import { Message } from './message.entity';
 import { Comment } from './comment.entity';
+import { Notification } from './notification.entity';
+import { Project } from './project.entity';
+import { Task } from './task.entity';
+import { Vacancy } from './vacancy.entity';
 
-export enum UserRole {
-  ADMIN = 'admin',
-  HR = 'hr',
-  PROJECT_MANAGER = 'project_manager',
-  FRONTEND = 'frontend',
-  BACKEND = 'backend',
-  USER = 'user',
-}
-
-@Entity('users')
+@Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ unique: true, nullable: false })
+  @Column({ unique: true })
   email: string;
 
-  @Column({ nullable: false })
+  @Column()
   password: string;
 
-  @Column({
+  @Column({ 
     type: 'enum',
     enum: UserRole,
-    default: UserRole.USER,
+    default: UserRole.USER
   })
   role: UserRole;
 
   @Column({ default: true })
   isActive: boolean;
 
-  @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
+  // Профиль
+  @OneToOne(() => Profile, profile => profile.user, { 
+    cascade: true,
+    eager: true 
+  })
+  @JoinColumn()
   profile: Profile;
 
-  @OneToMany(() => Vacancy, (vacancy) => vacancy.creator)
-  createdVacancies: Vacancy[];
-
-  @OneToMany(() => Vacancy, (vacancy) => vacancy.assignedHr)
-  assignedVacancies: Vacancy[];
-
-  @OneToMany(() => Candidate, (candidate) => candidate.addedBy)
+  // Кандидаты
+  @OneToMany(() => Candidate, candidate => candidate.addedBy)
   addedCandidates: Candidate[];
 
-  @OneToMany(() => Notification, (notification) => notification.sender)
-  sentNotifications: Notification[];
-
-  @ManyToMany(() => Notification, (notification) => notification.recipients)
-  receivedNotifications: Notification[];
-
-  @ManyToMany(() => Chat, (chat) => chat.participants)
+  // Чаты
+  @ManyToMany(() => Chat, chat => chat.participants)
   chats: Chat[];
 
-  @OneToMany(() => Chat, (chat) => chat.admin)
+  // Администрируемые чаты
+  @OneToMany(() => Chat, chat => chat.admin)
   adminChats: Chat[];
 
-  @OneToMany(() => Message, (message) => message.sender)
+  // Комментарии
+  @OneToMany(() => Comment, comment => comment.author)
+  comments: Comment[];
+
+  // Сообщения
+  @OneToMany(() => Message, message => message.sender)
   messages: Message[];
 
-  @OneToMany(() => Project, (project) => project.projectManager)
+  // Отправленные уведомления
+  @OneToMany(() => Notification, notification => notification.sender)
+  sentNotifications: Notification[];
+
+  // Полученные уведомления
+  @ManyToMany(() => Notification, notification => notification.recipients)
+  receivedNotifications: Notification[];
+
+  // Управляемые проекты
+  @OneToMany(() => Project, project => project.projectManager)
   managedProjects: Project[];
 
-  @ManyToMany(() => Project, (project) => project.developers)
+  // Проекты, в которых участвует
+  @ManyToMany(() => Project, project => project.developers)
   projects: Project[];
 
-  @OneToMany(() => Task, (task) => task.assignedTo)
+  // Назначенные задачи
+  @OneToMany(() => Task, task => task.assignedTo)
   assignedTasks: Task[];
 
-  @OneToMany(() => Task, (task) => task.creator)
+  // Созданные задачи
+  @OneToMany(() => Task, task => task.creator)
   createdTasks: Task[];
 
-  @OneToMany(() => Comment, (comment) => comment.author)
-  comments: Comment[];
+  // Созданные вакансии
+  @OneToMany(() => Vacancy, vacancy => vacancy.creator)
+  createdVacancies: Vacancy[];
+
+  // Назначенные вакансии (для HR)
+  @OneToMany(() => Vacancy, vacancy => vacancy.assignedHr)
+  assignedVacancies: Vacancy[];
 
   @CreateDateColumn()
   createdAt: Date;

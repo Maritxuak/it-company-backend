@@ -1,28 +1,28 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, description: 'The user has been successfully registered.' })
-  @ApiResponse({ status: 400, description: 'Bad Request.' })
-  @ApiBody({ type: RegisterDto })
   @Post('register')
+  @ApiOperation({ summary: 'Регистрация пользователя' })
+  @ApiResponse({ status: 201, description: 'Успешная регистрация' })
+  @ApiResponse({ status: 400, description: 'Невалидные данные' })
+  @ApiResponse({ status: 409, description: 'Email уже занят' })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
 
-  @ApiOperation({ summary: 'Login a user' })
-  @ApiResponse({ status: 200, description: 'The user has been successfully logged in.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @ApiBody({ type: LoginDto })
   @Post('login')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Авторизация пользователя' })
+  @ApiResponse({ status: 200, description: 'Успешный вход' })
+  @ApiResponse({ status: 401, description: 'Неверные учетные данные' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }

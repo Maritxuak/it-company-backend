@@ -20,7 +20,7 @@ export class Task {
   title: string;
 
   @Column()
-  description: Text;
+  description: string;
 
   @Column()
   dueDate: Date;
