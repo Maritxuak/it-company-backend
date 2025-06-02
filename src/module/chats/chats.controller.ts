@@ -41,7 +41,7 @@ export class ChatsController {
   @ApiParam({ name: 'userId', type: 'string', description: 'The ID of the user to remove' })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
-  @Patch(':chatId/users/:userId')
+  @Patch(':chatId/user/:userId')
   removeUserFromGroup(@Param('chatId') chatId: number, @Param('userId') userId: string) {
     return this.chatsService.removeUserFromGroup(chatId, userId);
   }

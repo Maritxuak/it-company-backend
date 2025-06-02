@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { databaseConfig } from './config/database.config';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './users/users.module';
 import { AuthModule } from './module/auth/auth.module';
 import { UserProfileModule } from './module/user-profile/user-profile.module';
 import { JobVacanciesModule } from './module/job-vacancies/job-vacancies.module';
@@ -19,7 +19,7 @@ import { ConfigService } from '@nestjs/config';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-        TypeOrmModule.forRootAsync({
+    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService): TypeOrmModuleOptions => ({
         type: 'postgres',
@@ -28,12 +28,12 @@ import { ConfigService } from '@nestjs/config';
         username: configService.getOrThrow<string>('DATABASE_USERNAME'),
         password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
         database: configService.getOrThrow<string>('DATABASE_NAME'),
-entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
         synchronize: true,
       }),
       inject: [ConfigService],
     }),
-    UsersModule,
+    UserModule,
     AuthModule,
     UserProfileModule,
     JobVacanciesModule,

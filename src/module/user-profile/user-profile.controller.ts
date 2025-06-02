@@ -6,6 +6,7 @@ import { UserProfileDto } from './dto/user-profile.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UserRole } from '../../enum/user-role.enum';
 
 @ApiTags('user-profile')
 @Controller('user-profile')
@@ -45,7 +46,7 @@ export class UserProfileController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Patch('change-role')
-  changeRole(@Body('userId') userId: string, @Body('role') role: string) {
+  changeRole(@Body('userId') userId: string, @Body('role') role: UserRole) {
     return this.userProfileService.changeRole(userId, role);
   }
 
@@ -72,7 +73,6 @@ export class UserProfileController {
   @ApiResponse({ status: 200, description: 'The profile of the specified user.', type: UserProfileDto })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiParam({ name: 'userId', type: 'string', description: 'The ID of the user whose profile is to be retrieved' })
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Get(':userId')
   getUserProfileById(@Param('userId') userId: string) {

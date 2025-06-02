@@ -7,6 +7,8 @@ import { Comment } from '../../entities/comment.entity';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { UserProfileService } from '../../module/user-profile/user-profile.service';
+import { UnassignedDeveloperDto } from './dto/unassigned-developer.dto';
 
 @Injectable()
 export class ProjectsService {
@@ -17,10 +19,21 @@ export class ProjectsService {
     private tasksRepository: Repository<Task>,
     @InjectRepository(Comment)
     private commentsRepository: Repository<Comment>,
+    private userService: UserProfileService,
   ) {}
 
   async createProject(createProjectDto: CreateProjectDto): Promise<Project> {
-    const project = this.projectsRepository.create(createProjectDto);
+    const { teamMembers, ...projectData } = createProjectDto;
+
+    // Create the project without developers first
+    const project = this.projectsRepository.create(projectData);
+
+    // If teamMembers is provided, fetch the users and associate them with the project
+    if (teamMembers && teamMembers.length > 0) {
+      const developers = await this.userService.findByIds(teamMembers);
+      project.developers = developers;
+    }
+
     return this.projectsRepository.save(project);
   }
 
@@ -48,5 +61,26 @@ export class ProjectsService {
 
   async getTaskComments(taskId: number): Promise<Comment[]> {
     return this.commentsRepository.find({ where: { task: { id: taskId } } });
+  }
+
+  async getUnassignedDevelopers(): Promise<UnassignedDeveloperDto[]> {
+    const allUsers = await this.userService.getAllUsers();
+    const allProjects = await this.projectsRepository.find({ relations: ['developers'] });
+
+    console.log('All users:', allUsers);
+    console.log('All projects:', allProjects);
+
+    const assignedUserIds = new Set(
+      allProjects.flatMap(project => project.developers.map(developer => developer.id))
+    );
+
+    return allUsers
+      .filter(user => user.role === 'development' && !assignedUserIds.has(user.id))
+      .map(user => ({
+        id: user.id,
+        role: user.role,
+        firstName: user.profile.firstName,
+        lastName: user.profile.lastName
+      } as UnassignedDeveloperDto));
   }
 }

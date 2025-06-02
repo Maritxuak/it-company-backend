@@ -4,6 +4,7 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { UnassignedDeveloperDto } from './dto/unassigned-developer.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -21,7 +22,6 @@ export class ProjectsController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiBody({ type: CreateProjectDto })
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('project_manager')
   @Post()
   createProject(@Body() createProjectDto: CreateProjectDto) {
     return this.projectsService.createProject(createProjectDto);
@@ -68,5 +68,14 @@ export class ProjectsController {
   @Get('tasks/:taskId/comments')
   getTaskComments(@Param('taskId') taskId: number) {
     return this.projectsService.getTaskComments(taskId);
+  }
+
+  @ApiOperation({ summary: 'Get all developers with role "development" not assigned to any project' })
+  @ApiResponse({ status: 200, description: 'The list of unassigned developers with role "development".', type: [UnassignedDeveloperDto] })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @UseGuards(JwtAuthGuard)
+  @Get('unassigned-developers')
+  getUnassignedDevelopers() {
+    return this.projectsService.getUnassignedDevelopers();
   }
 }

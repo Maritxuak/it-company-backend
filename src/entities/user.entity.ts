@@ -33,9 +33,10 @@ export class User {
   isActive: boolean;
 
   // Профиль
-  @OneToOne(() => Profile, profile => profile.user, { 
+  @OneToOne(() => Profile, profile => profile.user, {
     cascade: true,
-    eager: true 
+    eager: true,
+    onDelete: 'CASCADE'
   })
   @JoinColumn()
   profile: Profile;

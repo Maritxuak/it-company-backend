@@ -1,7 +1,18 @@
+import {ApiProperty} from "@nestjs/swagger";
+
 export class CreateProjectDto {
+  @ApiProperty()
   name: string;
+
+  @ApiProperty()
   description: string;
+
+  @ApiProperty()
   startDate: Date;
+
+  @ApiProperty()
   endDate: Date;
-  teamMembers: string[]; // Array of user IDs
+
+  @ApiProperty()
+  teamMembers: string[];
 }
