@@ -1,5 +1,7 @@
 # IT Company Backend
 
+This is the backend for the IT Company project.
+
 ## PostgreSQL Database Setup with TypeORM
 
 This NestJS application uses TypeORM to connect to a PostgreSQL database.

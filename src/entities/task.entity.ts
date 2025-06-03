@@ -41,7 +41,7 @@ export class Task {
   @ManyToOne(() => User, (user) => user.createdTasks)
   creator: User;
 
-  @ManyToOne(() => Project, (project) => project.tasks)
+  @ManyToOne(() => Project, (project) => project.tasks, { nullable: true })
   project: Project;
 
   @OneToMany(() => Comment, (comment) => comment.task)

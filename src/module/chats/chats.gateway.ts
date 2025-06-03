@@ -4,7 +4,15 @@ import { ChatsService } from './chats.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Authorization", "Content-Type"],
+     credentials: true,
+  },
+  transports: ["websocket", "polling"] 
+})
 export class ChatsGateway {
   @WebSocketServer()
   server: Server;

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Chat } from '../../entities/chat.entity';
 import { Message } from '../../entities/message.entity';
 import { CreateChatDto } from './dto/create-chat.dto';
@@ -35,5 +35,26 @@ export class ChatsService {
 
   async blockUser(userId: string, blockedUserId: string): Promise<void> {
     // Logic to block user
+  }
+
+  async getChatWithUser(userId: string, otherUserId: string): Promise<{ chat: Chat, messages: Message[] }> {
+    const chat = await this.chatsRepository.findOne({
+      where: {
+        type: 'private',
+        participants: {
+          id: In([userId, otherUserId])
+        }
+      },
+      relations: ['participants', 'messages', 'messages.sender']
+    });
+
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+
+    return {
+      chat,
+      messages: chat.messages
+    };
   }
 }

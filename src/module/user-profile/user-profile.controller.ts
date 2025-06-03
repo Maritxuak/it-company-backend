@@ -7,6 +7,8 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserRole } from '../../enum/user-role.enum';
+import { Project } from '../../entities/project.entity';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @ApiTags('user-profile')
 @Controller('user-profile')
@@ -77,5 +79,34 @@ export class UserProfileController {
   @Get(':userId')
   getUserProfileById(@Param('userId') userId: string) {
     return this.userProfileService.getUserProfile(userId);
+  }
+
+  /***
+   * Get all projects a user is working on.
+   * @param userId The ID of the user whose projects are to be retrieved.
+   * @returns The list of projects the user is working on.
+   */
+  @ApiOperation({ summary: 'Get user projects' })
+  @ApiResponse({ status: 200, description: 'The list of projects the user is working on.', type: [Project] })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiParam({ name: 'userId', type: 'string', description: 'The ID of the user whose projects are to be retrieved' })
+  @Roles('admin')
+  @Get(':userId/projects')
+  getUserProjects(@Param('userId') userId: string) {
+    return this.userProfileService.getUserProjects(userId);
+  }
+
+  /***
+   * Get all users with their details.
+   * @returns A list of users with their ID, first name, last name, and email.
+   */
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({ status: 200, description: 'A list of users with their details.', type: [UserResponseDto] })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Get('all')
+  getAllUsers() {
+    return this.userProfileService.getAllUsersWithDetails();
   }
 }
