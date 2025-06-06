@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { User } from './user.entity';
 import { Task } from './task.entity';
+import { ProjectCategory } from '../enum/project-category.enum';
 
 @Entity()
 export class Project {
@@ -18,6 +19,9 @@ export class Project {
 
   @Column()
   endDate: Date;
+
+  @Column({ type: 'int', default: ProjectCategory.WEB_PROJECT })
+  category: ProjectCategory;
 
   @ManyToOne(() => User, (user) => user.managedProjects)
   projectManager: User;

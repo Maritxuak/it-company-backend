@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
+import { UserRole } from '../enum/user-role.enum';
 
 @Injectable()
 export class UsersService {
@@ -34,5 +35,9 @@ export class UsersService {
 
   async remove(id: string): Promise<void> {
     await this.userRepository.delete(id);
+  }
+
+  async getHrManagers(): Promise<User[]> {
+    return this.userRepository.find({ where: { role: UserRole.HRMANAGER } });
   }
 }

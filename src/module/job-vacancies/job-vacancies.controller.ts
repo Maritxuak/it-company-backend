@@ -22,6 +22,9 @@ export class JobVacanciesController {
   @Roles('admin')
   @Post()
   createVacancy(@Body() createVacancyDto: CreateVacancyDto) {
+    if (!createVacancyDto.title) {
+      throw new Error('Title is required for creating a vacancy');
+    }
     return this.jobVacanciesService.createVacancy(createVacancyDto);
   }
 

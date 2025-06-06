@@ -39,4 +39,14 @@ export class NotificationsService {
     const unreadCount = notifications.length - readCount;
     return { readCount, unreadCount };
   }
+
+  async markAllAsRead(userId: string): Promise<void> {
+    const notifications = await this.notificationsRepository.find({ relations: ['recipients'] });
+    for (const notification of notifications) {
+      if (notification.recipients.some(r => r.id === userId)) {
+        notification.isRead = true;
+        await this.notificationsRepository.save(notification);
+      }
+    }
+  }
 }

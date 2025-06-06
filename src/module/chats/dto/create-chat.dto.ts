@@ -9,4 +9,7 @@ export class CreateChatDto {
 
   @ApiProperty({ example: true, description: 'Whether the chat is a group chat' })
   isGroup: boolean;
+
+  @ApiProperty({ example: 'private', description: 'The type of the chat' })
+  type: string;
 }

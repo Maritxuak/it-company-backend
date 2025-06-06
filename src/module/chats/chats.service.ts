@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Chat } from '../../entities/chat.entity';
 import { Message } from '../../entities/message.entity';
+import { User } from '../../entities/user.entity';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { CreateMessageDto } from './dto/create-message.dto';
 
@@ -21,7 +22,19 @@ export class ChatsService {
   }
 
   async sendMessage(createMessageDto: CreateMessageDto): Promise<Message> {
-    const message = this.messagesRepository.create(createMessageDto);
+    const chat = await this.chatsRepository.findOne({ where: { id: createMessageDto.chatId } });
+    if (!chat) {
+      throw new NotFoundException('Chat not found');
+    }
+    const sender = await this.chatsRepository.manager.findOne(User, { where: { id: createMessageDto.userId } });
+    if (!sender) {
+      throw new NotFoundException('User not found');
+    }
+    const message = this.messagesRepository.create({
+      ...createMessageDto,
+      chat,
+      sender
+    });
     return this.messagesRepository.save(message);
   }
 
@@ -30,31 +43,68 @@ export class ChatsService {
     if (!chat) {
       throw new NotFoundException('Chat not found');
     }
-    // Logic to remove user from group
   }
 
   async blockUser(userId: string, blockedUserId: string): Promise<void> {
-    // Logic to block user
   }
 
-  async getChatWithUser(userId: string, otherUserId: string): Promise<{ chat: Chat, messages: Message[] }> {
-    const chat = await this.chatsRepository.findOne({
-      where: {
-        type: 'private',
-        participants: {
-          id: In([userId, otherUserId])
-        }
-      },
-      relations: ['participants', 'messages', 'messages.sender']
-    });
-
+  async getMessagesByChatId(chatId: number): Promise<Message[]> {
+    const chat = await this.chatsRepository.findOne({ where: { id: chatId } });
     if (!chat) {
       throw new NotFoundException('Chat not found');
     }
+    return await this.messagesRepository.find({ where: { chat: { id: chatId } }, relations: ['sender'] });
+  }
+
+  async getChatWithUser(userId: string, otherUserId: string): Promise<{ chat: Chat, messages: Message[] }> {
+    let chat = await this.chatsRepository.findOne({
+        where: {
+            type: 'private',
+            participants: {
+                id: In([userId, otherUserId])
+            }
+        },
+        relations: ['participants', 'messages', 'messages.sender']
+    });
+
+    if (!chat) {
+        const newChat = new Chat();
+        newChat.name = `Chat between ${userId} and ${otherUserId}`;
+        newChat.type = 'private';
+        
+        const user1 = await this.chatsRepository.manager.findOne(User, { where: { id: userId } });
+        const user2 = await this.chatsRepository.manager.findOne(User, { where: { id: otherUserId } });
+        
+        if (!user1 || !user2) {
+            throw new NotFoundException('User not found');
+        }
+        
+        newChat.participants = [user1, user2];
+        newChat.messages = [];
+        chat = await this.chatsRepository.save(newChat);
+    } else {
+        const participantIds = chat.participants.map(p => p.id);
+        if (!participantIds.includes(userId) || !participantIds.includes(otherUserId)) {
+            const newChat = new Chat();
+            newChat.name = `Chat between ${userId} and ${otherUserId}`;
+            newChat.type = 'private';
+            
+            const user1 = await this.chatsRepository.manager.findOne(User, { where: { id: userId } });
+            const user2 = await this.chatsRepository.manager.findOne(User, { where: { id: otherUserId } });
+            
+            if (!user1 || !user2) {
+                throw new NotFoundException('User not found');
+            }
+            
+            newChat.participants = [user1, user2];
+            newChat.messages = [];
+            chat = await this.chatsRepository.save(newChat);
+        }
+    }
 
     return {
-      chat,
-      messages: chat.messages
+        chat,
+        messages: chat.messages || []
     };
-  }
+}
 }

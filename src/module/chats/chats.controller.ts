@@ -59,19 +59,20 @@ export class ChatsController {
 
   @ApiOperation({ summary: 'Get a chat with a user and the messages in it' })
   @ApiResponse({ status: 200, description: 'The chat and messages have been successfully retrieved.' })
-  @ApiResponse({ status: 404, description: 'Chat not found.' })
   @ApiParam({ name: 'otherUserId', type: 'string', description: 'The ID of the other user' })
   @UseGuards(JwtAuthGuard)
   @Get('with/:otherUserId')
   async getChatWithUser(@Param('otherUserId') otherUserId: string, @Req() req: any) {
     const userId = req.user.id;
-    try {
-      return await this.chatsService.getChatWithUser(userId, otherUserId);
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException('Chat not found');
-      }
-      throw error;
-    }
+    return await this.chatsService.getChatWithUser(userId, otherUserId);
+  }
+
+  @ApiOperation({ summary: 'Get messages from a chat' })
+  @ApiResponse({ status: 200, description: 'The messages have been successfully retrieved.' })
+  @ApiParam({ name: 'chatId', type: 'number', description: 'The ID of the chat' })
+  @UseGuards(JwtAuthGuard)
+  @Get('messages/:chatId')
+  async getMessages(@Param('chatId') chatId: number) {
+    return await this.chatsService.getMessagesByChatId(chatId);
   }
 }

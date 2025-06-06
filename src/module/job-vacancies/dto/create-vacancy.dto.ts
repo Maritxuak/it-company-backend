@@ -15,4 +15,10 @@ export class CreateVacancyDto {
 
   @ApiProperty({ example: '123e4567-e89b-12d3-a456-426614174000', description: 'The ID of the HR assigned to the vacancy' })
   hrId: string;
+
+  @ApiProperty({ example: 'Software Engineer', description: 'The title of the vacancy' })
+  title: string = 'Software Engineer';
+
+  @ApiProperty({ example: 'development', description: 'The role of the vacancy' })
+  role: string = 'development';
 }

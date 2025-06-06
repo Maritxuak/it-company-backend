@@ -63,4 +63,14 @@ export class NotificationsController {
   getNotificationReadStatus() {
     return this.notificationsService.getNotificationReadStatus();
   }
+
+  @ApiOperation({ summary: 'Mark all notifications as read' })
+  @ApiResponse({ status: 200, description: 'All notifications have been marked as read.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @UseGuards(JwtAuthGuard)
+  @Post('mark-all-read')
+  markAllAsRead(@Req() req: any) {
+    const userId = req.user.id;
+    return this.notificationsService.markAllAsRead(userId);
+  }
 }

@@ -16,6 +16,9 @@ export class JobVacanciesService {
   ) {}
 
   async createVacancy(createVacancyDto: CreateVacancyDto): Promise<Vacancy> {
+    if (!createVacancyDto.title) {
+      throw new Error('Title is required for creating a vacancy');
+    }
     const vacancy = this.vacanciesRepository.create(createVacancyDto);
     return this.vacanciesRepository.save(vacancy);
   }

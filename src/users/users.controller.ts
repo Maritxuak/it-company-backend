@@ -6,4 +6,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 @Controller('user')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
+
+  @Get('hr-managers')
+  async getHrManagers(): Promise<User[]> {
+    return this.userService.getHrManagers();
+  }
 }

@@ -1,4 +1,5 @@
 import {ApiProperty} from "@nestjs/swagger";
+import { ProjectCategory } from '../../../enum/project-category.enum';
 
 export class CreateProjectDto {
   @ApiProperty()
@@ -15,4 +16,7 @@ export class CreateProjectDto {
 
   @ApiProperty()
   teamMembers: string[];
+
+  @ApiProperty({ enum: ProjectCategory })
+  category: ProjectCategory;
 }

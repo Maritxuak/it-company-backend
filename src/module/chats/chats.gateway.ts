@@ -21,6 +21,7 @@ export class ChatsGateway {
 
   @SubscribeMessage('createChat')
   async handleCreateChat(@MessageBody() createChatDto: CreateChatDto) {
+    createChatDto.type = 'private'; // Set the type field
     const chat = await this.chatsService.createChat(createChatDto);
     this.server.emit('chatCreated', chat);
   }
