@@ -16,6 +16,7 @@ import { UnassignedDeveloperDto } from './dto/unassigned-developer.dto';
 import { User } from '../../entities/user.entity';
 import { ProjectCategory } from '../../enum/project-category.enum';
 import { TaskResponse } from './interfaces/task-response.interface';
+import { NotificationsService } from '../../module/notifications/notifications.service';
 
 @Injectable()
 export class ProjectsService {
@@ -27,15 +28,24 @@ export class ProjectsService {
         @InjectRepository(Comment)
         private commentsRepository: Repository<Comment>,
         private userService: UserProfileService,
+        private notificationsService: NotificationsService,
     ) {}
 
-    async createProject(createProjectDto: CreateProjectDto): Promise<Project> {
+  async createProject(createProjectDto: CreateProjectDto): Promise<Project> {
         const { teamMembers, ...projectData } = createProjectDto;
         const project = this.projectsRepository.create(projectData);
 
         if (teamMembers?.length > 0) {
             const developers = await this.userService.findByIds(teamMembers);
             project.developers = developers;
+
+            const notificationData = {
+                message: `Вам назначен новый проект: ${createProjectDto.name}`,
+                type: 'project_assignment',
+                recipientIds: developers.map(developer => developer.id),
+                isPublic: false,
+            };
+            await this.notificationsService.createNotification(notificationData);
         }
 
         return await this.projectsRepository.save(project);
@@ -68,7 +78,19 @@ export class ProjectsService {
         }
 
         const task = this.tasksRepository.create(taskData);
-        return await this.tasksRepository.save(task);
+        const savedTask = await this.tasksRepository.save(task);
+
+        if (assignedTo) {
+            const notificationData = {
+                message: `Вам назначена новая задача: ${createTaskDto.title}`,
+                type: 'task_assignment',
+                recipientIds: [assignedTo.id],
+                isPublic: false,
+            };
+            await this.notificationsService.createNotification(notificationData);
+        }
+
+        return savedTask;
     }
 
     async addComment(taskId: number, createCommentDto: CreateCommentDto): Promise<Comment> {

@@ -25,6 +25,9 @@ export class Vacancy {
   @Column()
   role: string;
 
+  @Column({ default: false })
+  isClosed: boolean;
+
   @ManyToOne(() => User, (user) => user.createdVacancies)
   creator: User;
 

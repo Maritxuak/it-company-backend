@@ -55,7 +55,7 @@ export class JobVacanciesController {
   @ApiBody({ type: CreateCandidateDto })
   @ApiParam({ name: 'id', type: 'number', description: 'The ID of the vacancy' })
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('hr')
+  @Roles('admin', 'hr')
   @Post(':id/candidates')
   addCandidate(@Param('id') id: number, @Body() createCandidateDto: CreateCandidateDto) {
     return this.jobVacanciesService.addCandidate(id, createCandidateDto);
@@ -74,9 +74,31 @@ export class JobVacanciesController {
     },
   })
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('hr')
+  @Roles('admin', 'hr')
   @Patch('candidates/:id/status')
   updateCandidateStatus(@Param('id') id: number, @Body('status') status: string) {
     return this.jobVacanciesService.updateCandidateStatus(id, status);
+  }
+
+  @ApiOperation({ summary: 'Update a candidate details' })
+  @ApiResponse({ status: 200, description: 'The candidate details have been successfully updated.', type: Candidate })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiParam({ name: 'id', type: 'number', description: 'The ID of the candidate' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        email: { type: 'string' },
+        phone: { type: 'string' },
+        status: { type: 'string' },
+      },
+    },
+  })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'hr')
+  @Patch('candidates/:id')
+  updateCandidate(@Param('id') id: number, @Body() updateCandidateDto: any) {
+    return this.jobVacanciesService.updateCandidate(id, updateCandidateDto);
   }
 }

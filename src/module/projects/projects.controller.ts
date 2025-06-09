@@ -161,6 +161,21 @@ export class ProjectsController {
     return this.projectsService.getAllProjects();
   }
 
+  @ApiOperation({ summary: 'Get detailed information about a specific project' })
+  @ApiResponse({ status: 200, description: 'Detailed information about the project.', type: Project })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 404, description: 'Project not found.' })
+  @ApiParam({ name: 'id', type: 'number', description: 'The ID of the project' })
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getProjectById(@Param('id') id: number) {
+    const project = await this.projectsService.findOne(id);
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+    return project;
+  }
+
   @ApiOperation({ summary: 'Update a project' })
   @ApiResponse({ status: 200, description: 'The project has been successfully updated.', type: Project })
   @ApiResponse({ status: 403, description: 'Forbidden.' })

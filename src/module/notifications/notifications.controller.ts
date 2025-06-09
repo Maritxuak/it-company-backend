@@ -33,14 +33,14 @@ export class NotificationsController {
     return this.notificationsService.getNotifications(userId);
   }
 
-  @ApiOperation({ summary: 'Get all notifications' })
-  @ApiResponse({ status: 200, description: 'The list of all notifications.', type: [Notification] })
+  @ApiOperation({ summary: 'Get all notifications for the current user' })
+  @ApiResponse({ status: 200, description: 'The list of all notifications for the current user.', type: [Notification] })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @UseGuards(JwtAuthGuard)
   @Get()
-  getAllNotifications() {
-    return this.notificationsService.getAllNotifications();
+  getAllNotifications(@Req() req: any) {
+    const userId = req.user.id;
+    return this.notificationsService.getAllNotifications(userId);
   }
 
   @ApiOperation({ summary: 'Mark a notification as read' })

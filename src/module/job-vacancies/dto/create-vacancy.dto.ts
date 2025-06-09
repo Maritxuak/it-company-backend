@@ -21,4 +21,7 @@ export class CreateVacancyDto {
 
   @ApiProperty({ example: 'development', description: 'The role of the vacancy' })
   role: string = 'development';
+
+  @ApiProperty({ example: false, description: 'Whether the vacancy is closed' })
+  isClosed: boolean = false;
 }

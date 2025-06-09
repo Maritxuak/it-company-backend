@@ -37,9 +37,9 @@ export class UserProfileService {
     return this.userRepository.save(user);
   }
 
-  async getUserProfile(userId: string): Promise<User | UserResponseDto[]> {
+  async getUserProfile(userId: string): Promise<User> {
     if (userId === 'all') {
-      return this.getAllUsersWithDetails();
+      throw new NotFoundException('User not found');
     }
 
     // Ensure we're using the correct type for the user ID

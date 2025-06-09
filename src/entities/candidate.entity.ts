@@ -8,24 +8,15 @@ export class Candidate {
   id: number;
 
   @Column()
-  firstName: string;
+  name: string;
 
   @Column()
-  lastName: string;
+  email: string;
 
   @Column()
-  address: string;
+  phone: string;
 
-  @Column()
-  birthDate: Date;
-
-  @Column()
-  resume: string;
-
-  @Column({ nullable: true })
-  notes: string;
-
-  @Column({ default: 'awaiting_first_stage' })
+  @Column({ default: 'new' })
   status: string;
 
   @ManyToOne(() => Vacancy, (vacancy) => vacancy.candidates)

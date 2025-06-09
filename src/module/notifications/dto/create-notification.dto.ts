@@ -9,4 +9,7 @@ export class CreateNotificationDto {
 
   @ApiProperty({ example: ['123e4567-e89b-12d3-a456-426614174000'], description: 'The IDs of the recipients' })
   recipientIds: string[];
+
+  @ApiProperty({ example: false, description: 'Whether the notification is public or not' })
+  isPublic: boolean;
 }
